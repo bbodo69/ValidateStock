@@ -33,14 +33,14 @@ def calculateBusinessDay(day):
 
     return todayDay
 
-def dicHighestPrice(df, day):
 
+def dicHighestPrice(df, day):
     dicResult = {}
 
     for idx, row in df.iterrows():
         tmpFlag = False
 
-        for i in range(1, day+1):
+        for i in range(1, day + 1):
             if idx + i < len(df):
                 if row['고가'] < df.loc[idx + i]['고가']:
                     tmpFlag = True
@@ -54,14 +54,14 @@ def dicHighestPrice(df, day):
 
     return dicResult
 
-def dicLowestPrice(df, day):
 
+def dicLowestPrice(df, day):
     dicResult = {}
 
     for idx, row in df.iterrows():
         tmpFlag = False
 
-        for i in range(1, day+1):
+        for i in range(1, day + 1):
             if idx + i < len(df):
                 if row['저가'] > df.loc[idx + i]['저가']:
                     tmpFlag = True
@@ -74,6 +74,7 @@ def dicLowestPrice(df, day):
             dicResult[row['날짜']] = row['저가']
 
     return dicResult
+
 
 # n 일자 전후로 최소값, 최대값 유지 됬던 날짜의 주식정보
 def RemainNDayPriceHighLowPrice(df, day, gubun):
@@ -288,14 +289,14 @@ def GetStockPrice(code):
 
     url = "https://finance.naver.com/item/sise_day.naver?code={}&page={}".format(code, 1)
     res = requests.get(url, headers={'User-agent': 'Mozilla/5.0'})
-    
+
     html = BeautifulSoup(res.text, 'lxml')
 
     pgrr = html.find('td', class_='pgRR').a['href']
 
     page = 25
 
-    if page > int(pgrr.split("=")[-1]) + 1: # 총 페이지 보다 높으면 마지막 페이지 가져오기
+    if page > int(pgrr.split("=")[-1]) + 1:  # 총 페이지 보다 높으면 마지막 페이지 가져오기
         page = int(pgrr.split("=")[-1]) + 1
 
     for page in range(1, page):
@@ -309,26 +310,27 @@ def GetStockPrice(code):
 
     return df
 
+
 def GetStockPriceWithPage(code, page):
     # 한국 지수별 가격정보 가져오기
 
     headers = {
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36'}
     time = datetime.today().strftime('%Y%m%d')
-    time = str(time)+("180000")
+    time = str(time) + ("180000")
 
     url = "https://finance.naver.com/item/sise_day.naver?code={}&page={}".format(code, 1)
     res = requests.get(url, headers={'User-agent': 'Mozilla/5.0'})
     html = BeautifulSoup(res.text, 'lxml')
     pgrr = html.find('td', class_='pgRR').a['href']
 
-    if page == -1 : # page 를 -1 로 했을 경우 전체 페이지 가져오기
+    if page == -1:  # page 를 -1 로 했을 경우 전체 페이지 가져오기
         page = pgrr.split("=")[-1]
-        page = int(page)+1
+        page = int(page) + 1
 
-    if page > int(pgrr.split("=")[-1]) + 1: # 총 페이지 보다 높으면 마지막 페이지 가져오기
+    if page > int(pgrr.split("=")[-1]) + 1:  # 총 페이지 보다 높으면 마지막 페이지 가져오기
         page = int(pgrr.split("=")[-1]) + 1
-        
+
     df = pd.DataFrame()
     for i in range(1, page):
         url = "https://finance.naver.com/item/sise_day.naver?code={}&page={}".format(code, time, i)
@@ -341,20 +343,21 @@ def GetStockPriceWithPage(code, page):
 
     return df
 
+
 def GetStockPriceMinute(code):
     # 한국 지수별 가격정보 가져오기
 
     headers = {
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36'}
     time = datetime.today().strftime('%Y%m%d')
-    time = str(time)+("180000")
+    time = str(time) + ("180000")
 
     url = "https://finance.naver.com/item/sise_time.naver?code={}&thistime={}&page={}".format(code, time, 1)
     res = requests.get(url, headers={'User-agent': 'Mozilla/5.0'})
     html = BeautifulSoup(res.text, 'lxml')
     pgrr = html.find('td', class_='pgRR').a['href']
     page = pgrr.split("=")[-1]
-    page = int(page)+1
+    page = int(page) + 1
     df = pd.DataFrame()
     for i in range(1, page):
         url = "https://finance.naver.com/item/sise_time.naver?code={}&thistime={}&page={}".format(code, time, i)
@@ -367,8 +370,8 @@ def GetStockPriceMinute(code):
 
     return df
 
-def CheckReturnPosition(df, gubun, countTick):
 
+def CheckReturnPosition(df, gubun, countTick):
     tick = GetTickFromMinuteDF(df)
     max = int(df.max()['체결가'])
     min = int(df.min()['체결가'])
@@ -385,8 +388,8 @@ def CheckReturnPosition(df, gubun, countTick):
             print("DOWN체결시각 : {0}, 체결가 : {1}".format(df.loc[0]['체결시각'], df.loc[0]['체결가']))
             return currentPrice
 
-def CheckReturnPositionInOrder(df, gubun, countTick):
 
+def CheckReturnPositionInOrder(df, gubun, countTick):
     tick = GetTickFromMinuteDF(df)
     max = 0
     min = 9999999
@@ -409,6 +412,7 @@ def CheckReturnPositionInOrder(df, gubun, countTick):
                     min = row['체결가']
                 if row['체결가'] - diffTickPrice == min:
                     print("UP체결시각 : {0}, 체결가 : {1}".format(row['체결시각'], row['체결가']))
+
 
 def GetTickFromDF(df):
     '''
@@ -438,6 +442,7 @@ def GetTickFromDF(df):
         return 500
     elif 500000 <= price:
         return 1000
+
 
 def GetTickFromMinuteDF(df):
     '''
@@ -469,6 +474,7 @@ def GetTickFromMinuteDF(df):
     elif 500000 <= price:
         return 1000
 
+
 def GetMovingAverage(df, day):
     # 이동평균선 계산
     dic = {}
@@ -489,6 +495,7 @@ def GetMovingAverage(df, day):
         dic[row['날짜']] = movingAverage
 
     return dic
+
 
 def GetDateFollowingMAPattern(df, day, gubun):
     # GetPositionUseMA
@@ -537,3 +544,48 @@ def GetDateFollowingMAPattern(df, day, gubun):
             dicResult[key] = dic[key]
 
     return dicResult
+
+
+def checkStockSplit(df, day):
+    for idx, row in df.iterrows():
+        if idx > day:
+            return True
+
+        if idx + 1 > len(df):
+            return True
+
+        if df.loc[idx]['종가'] > df.loc[idx + 1]['종가'] * 1.6:
+            print(idx)
+            return False
+        if df.loc[idx]['종가'] < df.loc[idx + 1]['종가'] * 0.4:
+            print(idx)
+            return False
+
+
+def standardizationStockSplit(df):
+    startStockSplit = False
+
+    for idx, row in df.iterrows():
+        if idx + 2 > len(df):
+            break
+
+        # 병합
+        if df.loc[idx]['종가'] > df.loc[idx + 1]['종가'] * 1.6 and not startStockSplit:
+            startStockSplit = True
+            gab = (df.loc[idx]['종가'] + df.loc[idx]['전일비']) // df.loc[idx + 1]['종가']
+            continue
+
+        # 분할
+        if df.loc[idx]['종가'] < df.loc[idx + 1]['종가'] * 0.4 and not startStockSplit:
+            startStockSplit = True
+            gab = df.loc[idx + 1]['종가'] // (df.loc[idx]['종가'] - df.loc[idx]['전일비'])
+            gab = 1 / gab
+            continue
+
+        if startStockSplit:
+            df.iloc[idx, df.columns.get_loc('종가')] = df.loc[idx]['종가'] * gab
+            df.iloc[idx, df.columns.get_loc('시가')] = df.loc[idx]['시가'] * gab
+            df.iloc[idx, df.columns.get_loc('고가')] = df.loc[idx]['고가'] * gab
+            df.iloc[idx, df.columns.get_loc('저가')] = df.loc[idx]['저가'] * gab
+
+    return df
