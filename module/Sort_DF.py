@@ -16,18 +16,15 @@ def CheckDateMAPattern(df, day, gubun, sDate):
     idxTargetDate = dfDateKey.index.get_loc(sDate)
 
     # day, sDate 를 구할수 없으면 False
-    if idxTargetDate + day > len(df) or idxTargetDate + len(gubun) > len(df):
+    if idxTargetDate + day  > len(df) or idxTargetDate + len(gubun) > len(df):
         return False
 
     dic = {}
-    dicResult = {}
 
     # 이동평균 구하기
     for idx, row in df.iterrows():
-        if idx > len(sDate) + 2 :
-            break
 
-        if idx + day > len(df):
+        if idx + day  > len(df) :
             break
 
         n = day
@@ -39,9 +36,10 @@ def CheckDateMAPattern(df, day, gubun, sDate):
         movingAverage = tmp / n
         movingAverage = int(movingAverage)
         dic[row['날짜']] = movingAverage
-
+        print(row['날짜'])
 
     for idx, c in enumerate(gubun[::-1]):
+
         if c == 'u':
             if list(dic.values())[idxTargetDate + idx] <= list(dic.values())[idxTargetDate + idx + 1]:
                 return False
