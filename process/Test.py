@@ -1,5 +1,4 @@
-import module.Common as Common
+import pandas as pd
 
-print('Hellow')
 
-Common.clearFolder('C:/Users/82107/Desktop/임시')
+print(df)
