@@ -712,5 +712,92 @@ def getGubunPriceUseDate(df, listDate):
 
     return dicResult
         
-        
+def GetMostPriceWithDate(df, date, day, gubun, n):
+    '''
+    :param df:
+    :param date: 대상 날짜
+    :param day:  유지 기간
+    :param gubun: '고가', '저가' 구분
+    :param n: 뽑을 갯수
+    :return:
+    '''
 
+    dic = {}
+    tmpKey = n
+
+    dfDateKey = df.set_index('날짜')
+
+    idxTargetDate = dfDateKey.index.get_loc(date)
+    
+    while n != 0:
+
+        for i in range(0, len(df)): # 대상 날짜에서 과거날짜 반복
+
+            checkMost = True
+
+            targetIdx = idxTargetDate + i # 비교날짜 인덱스 추출
+
+            if targetIdx + 1 >= len(df):
+                break
+
+            mostPrice = df.loc[targetIdx][gubun] # 첫 비교날짜 가격 추출
+
+            for j in range(1, day + 1): # 비교 날짜 앞뒤 날짜 추출 후 가격 최고, 최저 유지 비교
+                
+                afterTargetIdx = targetIdx - j
+                beforeTargetIdx = targetIdx + j
+
+                if afterTargetIdx > idxTargetDate :
+
+                    if gubun == '고가':
+                        if mostPrice < df.loc[afterTargetIdx][gubun]:
+                            checkMost = False
+                            break
+                            
+                    if gubun == '저가':
+                        if mostPrice > df.loc[afterTargetIdx][gubun]:
+                            checkMost = False
+                            break
+
+                if beforeTargetIdx < len(df) :
+                    if gubun == '고가':
+                        if mostPrice < df.loc[beforeTargetIdx][gubun]:
+                            checkMost = False
+                            break
+
+                    if gubun == '저가':
+                        if mostPrice > df.loc[beforeTargetIdx][gubun]:
+                            checkMost = False
+                            break
+
+            if checkMost == True:
+                dic[tmpKey - n] = {}
+                dic[tmpKey - n]['날짜'] = df.loc[targetIdx]['날짜']
+                dic[tmpKey - n]['가격'] = df.loc[targetIdx][gubun]
+                n -= 1
+
+            if n == 0:
+                break
+
+    return dic
+
+def getTrandLine(df, startDate, endDate, gubun):
+
+    dfDateKey = df.set_index('날짜')
+    startDateIdx = dfDateKey.index.get_loc(startDate)
+    endDateIdx = dfDateKey.index.get_loc(endDate)
+    diffDay = startDateIdx - endDateIdx
+
+    startDatePrice = df.loc[startDateIdx][gubun]
+    endDatePrice = df.loc[endDateIdx][gubun]
+    diffPrice = endDatePrice - startDatePrice
+
+    result = round(diffPrice / diffDay, 3)
+
+    return result
+
+def compareTwoDate(date1, date2):
+    if date1 > date2:
+        return True
+    else:
+        return False

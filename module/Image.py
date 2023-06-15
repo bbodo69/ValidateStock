@@ -146,3 +146,132 @@ def SaveDFImageWithBuyPrice(code, df, sFilePath, iBuyPrice):
     plt.clf()
 
 
+def SaveDFImageWithScatter2(df, x, y, dicScatterData, title, savePath):
+    '''
+    :param df: 네이버 주식 시세 df, dataProcess.GetStockInfo 결과값
+    :param x: x 축
+    :param y: y 축
+    :param dicScatterData: key : '날짜',  value : ['가격', '구분']
+    :param title: 이미지 상당 제목명
+    :param savePath: 이미지 파일 저장위치
+    :return:
+    '''
+
+    color = 'blue'
+
+    # df 를 이미지로 저장
+    plt.plot(df[x], df[y])
+
+    # for i in dicScatterData:
+    #     print(i)
+    # print(dicScatterData)
+
+    for i in dicScatterData:
+        xPoint = i
+        yPoint = dicScatterData[i]['가격']
+
+        if dicScatterData[i]['구분'] == 0:
+            color = 'blue'
+        elif dicScatterData[i]['구분'] == 1:
+            color = 'red'
+        elif dicScatterData[i]['구분'] == 2:
+            color = 'black'
+
+        plt.scatter(xPoint, yPoint, color=color)  # 위치에 점 찍기
+
+    # plt.grid(color='gray', linestyle='--')
+    plt.title(title)
+    # plt.legend(loc='upper left')
+    plt.gca().invert_xaxis()  # x 축 반전
+    plt.xticks([0, len(df) / 2, len(df) - 1], rotation=30)  # x 축 thick 지정 갯수 출력
+    plt.savefig(savePath)
+    plt.clf()
+
+
+def SaveDFImageWithScatter3(df, x, y, dicScatterData1, dicScatterData2, title, savePath):
+    '''
+    :param df: 네이버 주식 시세 df, dataProcess.GetStockInfo 결과값
+    :param x: x 축
+    :param y: y 축
+    :param dicScatterData: key : '날짜',  value : ['가격', '구분']
+    :param title: 이미지 상당 제목명
+    :param savePath: 이미지 파일 저장위치
+    :return:
+    '''
+
+    color = 'blue'
+
+    # df 를 이미지로 저장
+    plt.plot(df[x], df[y])
+
+    # for i in dicScatterData:
+    #     print(i)
+    # print(dicScatterData)
+
+    for i in dicScatterData1:
+        xPoint = i
+        yPoint = dicScatterData1[i]['가격']
+
+        if dicScatterData1[i]['구분'] == 0:
+            color = 'blue'
+        elif dicScatterData1[i]['구분'] == 1:
+            color = 'red'
+        elif dicScatterData1[i]['구분'] == 2:
+            color = 'black'
+
+        plt.scatter(xPoint, yPoint, color=color)  # 위치에 점 찍기
+
+
+    # plt.grid(color='gray', linestyle='--')
+    plt.title(title)
+    # plt.legend(loc='upper left')
+    plt.gca().invert_xaxis()  # x 축 반전
+    plt.xticks([0, len(df) / 2, len(df) - 1], rotation=30)  # x 축 thick 지정 갯수 출력
+    plt.savefig(savePath)
+    plt.clf()
+
+
+def SaveDFImageAddInfo(code, df, sFilePath, iBuyPrice, iExpectPrice, sExpectHighDay0):
+    # df 를 이미지로 저장
+    # plt.plot(df['날짜'], df['종가'], label=code)
+    plt.plot(df['날짜'], df['종가'])
+
+    # y 라인 그리기
+    plt.axhline(y=iBuyPrice, color='Black', linestyle='-')
+    plt.axhline(y=iExpectPrice, color='Blue', linestyle='-')
+    plt.text(0, iBuyPrice * 1.02, str(iBuyPrice))
+    plt.text(0, iExpectPrice * 0.98, str(iExpectPrice))
+
+    # plt.scatter(xPoint, yPoint, color="red")  # 위치에 점 찍기
+    # plt.text(xPoint, yPoint, str(yPoint))  # 위치에 텍스트 추가
+
+    # 그리드 설정
+    # plt.grid(color='gray', linestyle='--')
+    plt.title(str(code) + " / " + sExpectHighDay0)
+    # plt.legend(loc='upper left')
+    plt.gca().invert_xaxis()  # x 축 반전
+    plt.xticks([0, len(df) / 2, len(df) - 1], rotation=30)  # x 축 thick 지정 갯수 출력
+    plt.savefig(sFilePath)
+    plt.clf()
+
+
+def SaveDFImageWithBuyPrice(code, df, sFilePath, iBuyPrice):
+    # df 를 이미지로 저장
+    # plt.plot(df['날짜'], df['종가'], label=code)
+    plt.plot(df['날짜'], df['종가'])
+
+    # y 라인 그리기
+    plt.axhline(y=iBuyPrice, color='Black', linestyle='-')
+    plt.text(0, iBuyPrice * 1.02, str(iBuyPrice))
+
+    # plt.scatter(xPoint, yPoint, color="red")  # 위치에 점 찍기
+    # plt.text(xPoint, yPoint, str(yPoint))  # 위치에 텍스트 추가
+
+    # 그리드 설정
+    # plt.grid(color='gray', linestyle='--')
+    plt.title(str(code))
+    # plt.legend(loc='upper left')
+    plt.gca().invert_xaxis()  # x 축 반전
+    plt.xticks([0, len(df) / 2, len(df) - 1], rotation=30)  # x 축 thick 지정 갯수 출력
+    plt.savefig(sFilePath)
+    plt.clf()

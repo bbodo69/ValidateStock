@@ -55,11 +55,23 @@ for idx, row in df.iterrows():
 
     # 코드 이동평균선 뽑아오기
     dicMV = dataProcessing.GetMV(dfCode, 5)
-    
+
+    # ......시작 Dic = 조건을 따르는 날짜를 리턴.........
+
     # 종목의 이동평균선 패턴 따르는 일자 리턴 
     dicMVPatten = dataProcessing.GetMVPattern(dicMV, 'dduu')
+    print(dicMVPatten)
+
+    # 최고, 최저 날짜, 가격 뽑기
+    for i in dicMVPatten.copy().keys():
+        dicMostHighPrice = dataProcessing.GetMostPriceWithDate(df=dfCode , date=i, day=20, gubun="고가", n=1)
+        dicMostLowPrice = dataProcessing.GetMostPriceWithDate(df=dfCode , date=i, day=20, gubun="저가", n=1)
+        if dicMostLowPrice[0]['날짜'] < dicMostHighPrice[0]['날짜']:
+            del dicMVPatten[i]
 
     print(dicMVPatten)
+
+    # ......종료 Dic = 조건을 따르는 날짜를 리턴.........
 
     # 날짜 list 의 가격 정보를 리턴
     dicGubunPrice = dataProcessing.getGubunPriceUseDate(dfCode, list(dicMVPatten.keys()))
