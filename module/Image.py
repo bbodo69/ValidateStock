@@ -157,8 +157,6 @@ def SaveDFImageWithScatter2(df, x, y, dicScatterData, title, savePath):
     :return:
     '''
 
-    color = 'blue'
-
     # df 를 이미지로 저장
     plt.plot(df[x], df[y])
 
@@ -188,7 +186,7 @@ def SaveDFImageWithScatter2(df, x, y, dicScatterData, title, savePath):
     plt.clf()
 
 
-def SaveDFImageWithScatter3(df, x, y, dicScatterData1, dicScatterData2, title, savePath):
+def SaveDFImageWithScatter3(df, x, dicScatterData, dicTotalHighPrice, dicTotalLowPrice, title, savePath):
     '''
     :param df: 네이버 주식 시세 df, dataProcess.GetStockInfo 결과값
     :param x: x 축
@@ -199,34 +197,88 @@ def SaveDFImageWithScatter3(df, x, y, dicScatterData1, dicScatterData2, title, s
     :return:
     '''
 
-    color = 'blue'
-
     # df 를 이미지로 저장
-    plt.plot(df[x], df[y])
+    plt.figure(figsize=(20, 15))
+    plt.plot(df[x], df['종가'], label = 'end')
+    plt.plot(df[x], df['고가'], label='high', linestyle='dashed')
+    plt.plot(df[x], df['저가'], label='low', linestyle='dashed')
 
     # for i in dicScatterData:
     #     print(i)
     # print(dicScatterData)
 
-    for i in dicScatterData1:
+    for i in dicScatterData:
         xPoint = i
-        yPoint = dicScatterData1[i]['가격']
+        yPoint = dicScatterData[i]['가격']
 
-        if dicScatterData1[i]['구분'] == 0:
+        if dicScatterData[i]['구분'] == 0:
             color = 'blue'
-        elif dicScatterData1[i]['구분'] == 1:
+        elif dicScatterData[i]['구분'] == 1:
             color = 'red'
-        elif dicScatterData1[i]['구분'] == 2:
+        elif dicScatterData[i]['구분'] == 2:
             color = 'black'
 
-        plt.scatter(xPoint, yPoint, color=color)  # 위치에 점 찍기
+        plt.scatter(xPoint, yPoint, color=color, s=100)  # 위치에 점 찍기
 
+    for i in dicTotalLowPrice:
+        xPoint = i
+        yPoint = dicTotalLowPrice[i]
+        plt.scatter(xPoint, yPoint, color='yellow', s=100)  # 위치에 점 찍기
+
+    for i in dicTotalHighPrice:
+        xPoint = i
+        yPoint = dicTotalHighPrice[i]
+        plt.scatter(xPoint, yPoint, color='green', s=100)  # 위치에 점 찍기
 
     # plt.grid(color='gray', linestyle='--')
     plt.title(title)
     # plt.legend(loc='upper left')
     plt.gca().invert_xaxis()  # x 축 반전
     plt.xticks([0, len(df) / 2, len(df) - 1], rotation=30)  # x 축 thick 지정 갯수 출력
+
+    plt.savefig(savePath)
+    plt.clf()
+
+def SaveDFImageWithScatter4(df, x, dicScatterData, title, savePath):
+    '''
+    :param df: 네이버 주식 시세 df, dataProcess.GetStockInfo 결과값
+    :param x: x 축
+    :param y: y 축
+    :param dicScatterData: key : '날짜',  value : ['가격', '구분']
+    :param title: 이미지 상당 제목명
+    :param savePath: 이미지 파일 저장위치
+    :return:
+    '''
+
+    # df 를 이미지로 저장
+    plt.figure(figsize=(20, 15))
+    plt.plot(df[x], df['종가'], label = 'end')
+    plt.plot(df[x], df['고가'], label='high', linestyle='dashed')
+    plt.plot(df[x], df['저가'], label='low', linestyle='dashed')
+
+    # for i in dicScatterData:
+    #     print(i)
+    # print(dicScatterData)
+
+    for i in dicScatterData:
+        xPoint = i
+        yPoint = dicScatterData[i]['가격']
+
+        if dicScatterData[i]['구분'] == 0:
+            color = 'blue'
+        elif dicScatterData[i]['구분'] == 1:
+            color = 'red'
+        elif dicScatterData[i]['구분'] == 2:
+            color = 'black'
+
+        plt.scatter(xPoint, yPoint, color=color)  # 위치에 점 찍기
+
+    # plt.grid(color='gray', linestyle='--')
+    plt.title(title)
+    # plt.legend(loc='upper left')
+    plt.gca().invert_xaxis()  # x 축 반전
+    plt.xticks([0, len(df) / 2, len(df) - 1], rotation=30)  # x 축 thick 지정 갯수 출력
+
     plt.savefig(savePath)
     plt.clf()
 

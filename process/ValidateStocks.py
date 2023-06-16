@@ -36,8 +36,8 @@ df = excel_collection.readExcelToDataFrame(masterFilePath, sheetName)  # 코스�
 
 for idx, row in df.iterrows():
 
-    if row['code'] != '000020':
-        continue
+    # if row['code'] != '000020':
+    #     continue
 
     # 초기화
     dfCode = dataProcessing.GetStockPrice(row['code'])
@@ -49,6 +49,8 @@ for idx, row in df.iterrows():
     cnt1 = 0
     cnt2 = 0
     period = 0
+    dicTotalHighPrice = {}
+    dicTotalLowPrice = {}
 
     # 배당락, 병합, 분할 표준화
     dfCode = dataProcessing.standardizationStockSplit(dfCode)
@@ -60,24 +62,30 @@ for idx, row in df.iterrows():
 
     # 종목의 이동평균선 패턴 따르는 일자 리턴 
     dicMVPatten = dataProcessing.GetMVPattern(dicMV, 'dduu')
-    print(dicMVPatten)
 
     # 최고, 최저 날짜, 가격 뽑기
     for i in dicMVPatten.copy().keys():
-        dicMostHighPrice = dataProcessing.GetMostPriceWithDate(df=dfCode , date=i, day=20, gubun="고가", n=1)
-        dicMostLowPrice = dataProcessing.GetMostPriceWithDate(df=dfCode , date=i, day=20, gubun="저가", n=1)
-        if dicMostLowPrice[0]['날짜'] < dicMostHighPrice[0]['날짜']:
-            del dicMVPatten[i]
+        dicMostHighPrice = {}
+        dicMostLowPrice = {}
+        dicMostHighPrice = dataProcessing.GetMostPriceBeforeTargetDate(df=dfCode , targetDate=i, day=10, gubun="고가", n=1)
+        dicMostLowPrice = dataProcessing.GetMostPriceBeforeTargetDate(df=dfCode , targetDate=i, day=10, gubun="저가", n=1)
 
-    print(dicMVPatten)
+        if dicMostLowPrice is None or dicMostHighPrice is None:
+            continue
+
+        if not dicMostLowPrice[0]['날짜'] in dicTotalLowPrice.keys() :
+            dicTotalLowPrice[dicMostLowPrice[0]['날짜']] = dicMostLowPrice[0]['가격']
+
+        if not dicMostHighPrice[0]['날짜'] in dicTotalHighPrice.keys() :
+            dicTotalHighPrice[dicMostHighPrice[0]['날짜']] = dicMostHighPrice[0]['가격']
+
+        # if dicMostLowPrice[0]['날짜'] < dicMostHighPrice[0]['날짜']:
+        #     del dicMVPatten[i]
 
     # ......종료 Dic = 조건을 따르는 날짜를 리턴.........
 
     # 날짜 list 의 가격 정보를 리턴
     dicGubunPrice = dataProcessing.getGubunPriceUseDate(dfCode, list(dicMVPatten.keys()))
-
-    print(dicGubunPrice)
-
     for i in dicMVPatten.keys():
         # 날짜, 매수날종가, 소요기간, 구분 리턴
         dicBuySellResult = resultBuySell.GetBuySellResultUseDatePriceExpireDate(df=dfCode, date=i, buyRate=0.99, sellRate=1.025, exDate=50)
@@ -87,13 +95,16 @@ for idx, row in df.iterrows():
         if dicBuySellResult['구분'] == 0:
             cnt0 += 1
             totalCnt0 += 1
+
         elif dicBuySellResult['구분'] == 1:
             period += int(dicBuySellResult['소요기간'])
             cnt1 += 1
             totalCnt1 += 1
+
         elif dicBuySellResult['구분'] == 2:
             cnt2 += 1
             totalCnt2 += 1
+
         cnt += 1
         totalCnt += 1
 
@@ -101,15 +112,11 @@ for idx, row in df.iterrows():
         avgPeriod = round(period / cnt1, 2)
 
     totalSellPeriod += period
-
     if totalSellPeriod != 0 :
         avgSellPeriod = round(totalSellPeriod / totalCnt1, 2)
 
-    Image.SaveDFImageWithScatter2(df = dfCode, x = '날짜', y = '종가', dicScatterData = dicScatterDate, title = row['code'], savePath = imgFilePath)
-
+    Image.SaveDFImageWithScatter3(df = dfCode, x = '날짜', dicScatterData = dicScatterDate, dicTotalHighPrice=dicTotalHighPrice, dicTotalLowPrice=dicTotalLowPrice, title = row['code'], savePath = imgFilePath)
     dfTotal.loc[len(dfTotal)] = {'종목코드': row['code'], 'totalCnt': totalCnt, 'totalCnt0': totalCnt0, 'totalCnt1': totalCnt1, 'totalCnt2': totalCnt2, 'period' : avgPeriod, 'avgPeriod' : avgSellPeriod}
-
     excel_collection.saveDFToNewExcel(resultFilePath, 'result', dfTotal)
 
     print('{0} / {1} ::: totalCnt : {2}, totalCnt0 : {3}, totalCnt1 : {4}, totalCnt2 : {5}'.format(idx + 1, len(df), totalCnt, totalCnt0, totalCnt1, totalCnt2))
-

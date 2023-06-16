@@ -712,7 +712,7 @@ def getGubunPriceUseDate(df, listDate):
 
     return dicResult
         
-def GetMostPriceWithDate(df, date, day, gubun, n):
+def GetMostPriceBeforeTargetDate(df, targetDate, day, gubun, n):
     '''
     :param df:
     :param date: 대상 날짜
@@ -727,22 +727,24 @@ def GetMostPriceWithDate(df, date, day, gubun, n):
 
     dfDateKey = df.set_index('날짜')
 
-    idxTargetDate = dfDateKey.index.get_loc(date)
+    idxTargetDate = dfDateKey.index.get_loc(targetDate)
     
     while n != 0:
 
-        for i in range(0, len(df)): # 대상 날짜에서 과거날짜 반복
+        for i in range(1, len(df)): # 대상 날짜에서 과거날짜 반복
 
             checkMost = True
 
             targetIdx = idxTargetDate + i # 비교날짜 인덱스 추출
 
             if targetIdx + 1 >= len(df):
+                n -= 1
                 break
 
             mostPrice = df.loc[targetIdx][gubun] # 첫 비교날짜 가격 추출
 
             for j in range(1, day + 1): # 비교 날짜 앞뒤 날짜 추출 후 가격 최고, 최저 유지 비교
+                # print('targetIdx : i')
                 
                 afterTargetIdx = targetIdx - j
                 beforeTargetIdx = targetIdx + j
@@ -778,6 +780,9 @@ def GetMostPriceWithDate(df, date, day, gubun, n):
 
             if n == 0:
                 break
+
+    if len(dic) == 0:
+        return None
 
     return dic
 
