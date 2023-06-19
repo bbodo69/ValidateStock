@@ -54,6 +54,7 @@ for idx, row in df.iterrows():
     # 배당락, 병합, 분할 표준화
     dfCode = dataProcessing.standardizationStockSplit(dfCode)
     targetDate = datetime.datetime.now().strftime('%Y.%m.%d')
+    targetDate = ' '
 
     dicMostHighPrice = dataProcessing.GetMostPriceBeforeTargetDate(df=dfCode , targetDate=targetDate, day=7, gubun="고가", n=15)
     dicMostLowPrice = dataProcessing.GetMostPriceBeforeTargetDate(df=dfCode, targetDate=targetDate, day=7, gubun="저가", n=15)
@@ -61,7 +62,7 @@ for idx, row in df.iterrows():
     dicMostHighPriceScatter = {}
     dicMostLowPriceScatter = {}
 
-    if len(dicMostHighPrice) == 0 or len(dicMostLowPrice) == 0:
+    if dicMostHighPrice is None or dicMostLowPrice is None:
         continue
 
     for i in dicMostHighPrice :
