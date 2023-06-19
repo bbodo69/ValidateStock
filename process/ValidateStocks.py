@@ -6,6 +6,7 @@ import module.resultBuySell as resultBuySell
 import module.Sort_DF as Sort_Df
 import module.Image as Image
 import pandas as pd
+import datetime
 
 rootPath = 'C:\Python_Stocks'
 inputFolderPath = os.path.join(rootPath, 'input')
@@ -35,9 +36,9 @@ Common.clearFolder(imgFolderPath)
 df = excel_collection.readExcelToDataFrame(masterFilePath, sheetName)  # 코스피 코드 받아오기
 
 for idx, row in df.iterrows():
-
-    if row['code'] != '000020':
-        continue
+    #
+    # if row['code'] != '000020':
+    #     continue
 
     # 초기화
     dfCode = dataProcessing.GetStockPrice(row['code'])
@@ -52,7 +53,28 @@ for idx, row in df.iterrows():
 
     # 배당락, 병합, 분할 표준화
     dfCode = dataProcessing.standardizationStockSplit(dfCode)
+    targetDate = datetime.datetime.now().strftime('%Y.%m.%d')
 
+    dicMostHighPrice = dataProcessing.GetMostPriceBeforeTargetDate(df=dfCode , targetDate=targetDate, day=7, gubun="고가", n=15)
+    dicMostLowPrice = dataProcessing.GetMostPriceBeforeTargetDate(df=dfCode, targetDate=targetDate, day=7, gubun="저가", n=15)
+
+    dicMostHighPriceScatter = {}
+    dicMostLowPriceScatter = {}
+
+    if len(dicMostHighPrice) == 0 or len(dicMostLowPrice) == 0:
+        continue
+
+    for i in dicMostHighPrice :
+        dicMostHighPriceScatter[dicMostHighPrice[i]['날짜']] = dicMostHighPrice[i]['가격']
+
+    for i in dicMostLowPrice :
+        dicMostLowPriceScatter[dicMostLowPrice[i]['날짜']] = dicMostLowPrice[i]['가격']
+
+    Image.SaveDFImageWithScatter3(df = dfCode, x = '날짜', dicScatterData = dicScatterDate, dicTotalHighPrice=dicMostHighPriceScatter, dicTotalLowPrice=dicMostLowPriceScatter, title = row['code'], savePath = imgFilePath)
+
+    print('{0} / {1} ::: totalCnt : {2}, totalCnt0 : {3}, totalCnt1 : {4}, totalCnt2 : {5}'.format(idx + 1, len(df), totalCnt, totalCnt0, totalCnt1, totalCnt2))
+
+'''
     # 코드 이동평균선 뽑아오기
     dicMV = dataProcessing.GetMV(dfCode, 5)
 
@@ -113,12 +135,11 @@ for idx, row in df.iterrows():
 
     if totalSellPeriod != 0 :
         avgSellPeriod = round(totalSellPeriod / totalCnt1, 2)
+'''
 
-    Image.SaveDFImageWithScatter2(df = dfCode, x = '날짜', y = '종가', dicScatterData = dicScatterDate, title = row['code'], savePath = imgFilePath)
 
-    dfTotal.loc[len(dfTotal)] = {'종목코드': row['code'], 'totalCnt': totalCnt, 'totalCnt0': totalCnt0, 'totalCnt1': totalCnt1, 'totalCnt2': totalCnt2, 'period' : avgPeriod, 'avgPeriod' : avgSellPeriod}
+    # dfTotal.loc[len(dfTotal)] = {'종목코드': row['code'], 'totalCnt': totalCnt, 'totalCnt0': totalCnt0, 'totalCnt1': totalCnt1, 'totalCnt2': totalCnt2, 'period' : avgPeriod, 'avgPeriod' : avgSellPeriod}
 
-    excel_collection.saveDFToNewExcel(resultFilePath, 'result', dfTotal)
+    # excel_collection.saveDFToNewExcel(resultFilePath, 'result', dfTotal)
 
-    print('{0} / {1} ::: totalCnt : {2}, totalCnt0 : {3}, totalCnt1 : {4}, totalCnt2 : {5}'.format(idx + 1, len(df), totalCnt, totalCnt0, totalCnt1, totalCnt2))
 

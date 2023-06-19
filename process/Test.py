@@ -2,6 +2,7 @@ import pandas as pd
 import module.dataProcessing as dataProcessing
 import module.DF_Process as DF_Process
 import time
+import datetime
 
 # startTime = time.time()
 # df = dataProcessing.GetStockPrice('005930')
@@ -17,8 +18,4 @@ import time
 
 # dataProcessing.compareTwoDate()
 
-date1 = '2023.05.17'
-date2 = '2023.05.18'
-
-print(date1 > date2)
-print(date1)
+print(datetime.datetime.now().strftime('%Y.%m.%d'))
