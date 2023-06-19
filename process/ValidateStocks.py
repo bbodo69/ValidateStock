@@ -1,7 +1,11 @@
 import os
 import module.Common as Common
 import module.excel_collection as excel_collection
+import module.dataProcessing as dataProcessing
+import module.resultBuySell as resultBuySell
+import module.Image as Image
 import pandas as pd
+
 
 rootPath = 'C:\Python_Stocks'
 inputFolderPath = os.path.join(rootPath, 'input')
@@ -14,7 +18,6 @@ sheetName = 'KOSPI'
 resultFilePath = os.path.join(resultFolderPath, 'result.xlsx')
 
 dfTotal = pd.DataFrame(columns=['종목코드', 'totalCnt', 'totalCnt0', 'totalCnt1', 'totalCnt2', 'period', 'avgPeriod'])
-
 
 avgSellPriod = 0
 totalSellPeriod = 0
@@ -34,9 +37,6 @@ Common.clearFolder(imgFolderPath)
 df = excel_collection.readExcelToDataFrame(masterFilePath, sheetName)  # 코스피 코드 받아오기
 
 for idx, row in df.iterrows():
-
-    if row['code'] != '000020':
-        continue
 
     # 초기화
     dfCode = dataProcessing.GetStockPrice(row['code'])
@@ -58,12 +58,8 @@ for idx, row in df.iterrows():
     # 종목의 이동평균선 패턴 따르는 일자 리턴
     dicMVPatten = dataProcessing.GetMVPattern(dicMV, 'dduu')
 
-    print(dicMVPatten)
-
     # 날짜 list 의 가격 정보를 리턴
     dicGubunPrice = dataProcessing.getGubunPriceUseDate(dfCode, list(dicMVPatten.keys()))
-
-    print(dicGubunPrice)
 
     for i in dicMVPatten.keys():
         # 날짜, 매수날종가, 소요기간, 구분 리턴
