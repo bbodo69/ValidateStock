@@ -33,14 +33,14 @@ def calculateBusinessDay(day):
 
     return todayDay
 
-def dicHighestPrice(df, day):
 
+def dicHighestPrice(df, day):
     dicResult = {}
 
     for idx, row in df.iterrows():
         tmpFlag = False
 
-        for i in range(1, day+1):
+        for i in range(1, day + 1):
             if idx + i < len(df):
                 if row['고가'] < df.loc[idx + i]['고가']:
                     tmpFlag = True
@@ -54,14 +54,14 @@ def dicHighestPrice(df, day):
 
     return dicResult
 
-def dicLowestPrice(df, day):
 
+def dicLowestPrice(df, day):
     dicResult = {}
 
     for idx, row in df.iterrows():
         tmpFlag = False
 
-        for i in range(1, day+1):
+        for i in range(1, day + 1):
             if idx + i < len(df):
                 if row['저가'] > df.loc[idx + i]['저가']:
                     tmpFlag = True
@@ -74,6 +74,7 @@ def dicLowestPrice(df, day):
             dicResult[row['날짜']] = row['저가']
 
     return dicResult
+
 
 # n 일자 전후로 최소값, 최대값 유지 됬던 날짜의 주식정보
 def RemainNDayPriceHighLowPrice(df, day, gubun):
@@ -281,21 +282,16 @@ def ExpectNextHighPrice(code, df):
 
 def GetStockPrice(code):
     # 한국 지수별 가격정보 가져오기
-
     headers = {
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36'}
     df = pd.DataFrame()
-
     url = "https://finance.naver.com/item/sise_day.naver?code={}&page={}".format(code, 1)
     res = requests.get(url, headers={'User-agent': 'Mozilla/5.0'})
-    
     html = BeautifulSoup(res.text, 'lxml')
-
     pgrr = html.find('td', class_='pgRR').a['href']
-
     page = 25
 
-    if page > int(pgrr.split("=")[-1]) + 1: # 총 페이지 보다 높으면 마지막 페이지 가져오기
+    if page > int(pgrr.split("=")[-1]) + 1:  # 총 페이지 보다 높으면 마지막 페이지 가져오기
         page = int(pgrr.split("=")[-1]) + 1
 
     for page in range(1, page):
@@ -309,26 +305,27 @@ def GetStockPrice(code):
 
     return df
 
+
 def GetStockPriceWithPage(code, page):
     # 한국 지수별 가격정보 가져오기
 
     headers = {
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36'}
     time = datetime.today().strftime('%Y%m%d')
-    time = str(time)+("180000")
+    time = str(time) + ("180000")
 
     url = "https://finance.naver.com/item/sise_day.naver?code={}&page={}".format(code, 1)
     res = requests.get(url, headers={'User-agent': 'Mozilla/5.0'})
     html = BeautifulSoup(res.text, 'lxml')
     pgrr = html.find('td', class_='pgRR').a['href']
 
-    if page == -1 : # page 를 -1 로 했을 경우 전체 페이지 가져오기
+    if page == -1:  # page 를 -1 로 했을 경우 전체 페이지 가져오기
         page = pgrr.split("=")[-1]
-        page = int(page)+1
+        page = int(page) + 1
 
-    if page > int(pgrr.split("=")[-1]) + 1: # 총 페이지 보다 높으면 마지막 페이지 가져오기
+    if page > int(pgrr.split("=")[-1]) + 1:  # 총 페이지 보다 높으면 마지막 페이지 가져오기
         page = int(pgrr.split("=")[-1]) + 1
-        
+
     df = pd.DataFrame()
     for i in range(1, page):
         url = "https://finance.naver.com/item/sise_day.naver?code={}&page={}".format(code, time, i)
@@ -341,20 +338,21 @@ def GetStockPriceWithPage(code, page):
 
     return df
 
+
 def GetStockPriceMinute(code):
     # 한국 지수별 가격정보 가져오기
 
     headers = {
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36'}
     time = datetime.today().strftime('%Y%m%d')
-    time = str(time)+("180000")
+    time = str(time) + ("180000")
 
     url = "https://finance.naver.com/item/sise_time.naver?code={}&thistime={}&page={}".format(code, time, 1)
     res = requests.get(url, headers={'User-agent': 'Mozilla/5.0'})
     html = BeautifulSoup(res.text, 'lxml')
     pgrr = html.find('td', class_='pgRR').a['href']
     page = pgrr.split("=")[-1]
-    page = int(page)+1
+    page = int(page) + 1
     df = pd.DataFrame()
     for i in range(1, page):
         url = "https://finance.naver.com/item/sise_time.naver?code={}&thistime={}&page={}".format(code, time, i)
@@ -367,8 +365,8 @@ def GetStockPriceMinute(code):
 
     return df
 
-def CheckReturnPosition(df, gubun, countTick):
 
+def CheckReturnPosition(df, gubun, countTick):
     tick = GetTickFromMinuteDF(df)
     max = int(df.max()['체결가'])
     min = int(df.min()['체결가'])
@@ -385,8 +383,8 @@ def CheckReturnPosition(df, gubun, countTick):
             print("DOWN체결시각 : {0}, 체결가 : {1}".format(df.loc[0]['체결시각'], df.loc[0]['체결가']))
             return currentPrice
 
-def CheckReturnPositionInOrder(df, gubun, countTick):
 
+def CheckReturnPositionInOrder(df, gubun, countTick):
     tick = GetTickFromMinuteDF(df)
     max = 0
     min = 9999999
@@ -409,6 +407,7 @@ def CheckReturnPositionInOrder(df, gubun, countTick):
                     min = row['체결가']
                 if row['체결가'] - diffTickPrice == min:
                     print("UP체결시각 : {0}, 체결가 : {1}".format(row['체결시각'], row['체결가']))
+
 
 def GetTickFromDF(df):
     '''
@@ -439,6 +438,7 @@ def GetTickFromDF(df):
     elif 500000 <= price:
         return 1000
 
+
 def GetTickFromMinuteDF(df):
     '''
     호가 단위
@@ -468,6 +468,7 @@ def GetTickFromMinuteDF(df):
         return 500
     elif 500000 <= price:
         return 1000
+
 
 def GetMovingAverage(df, day):
     # 이동평균선 계산
@@ -710,52 +711,98 @@ def getGubunPriceUseDate(df, listDate):
         dicResult[i]['시가'] = dfDateKey.loc[i]['시가']
 
     return dicResult
+        
+def GetMostPriceBeforeTargetDate(df, targetDate, day, gubun, n):
+    '''
+    :param df:
+    :param date: 대상 날짜
+    :param day:  유지 기간
+    :param gubun: '고가', '저가' 구분
+    :param n: 뽑을 갯수
+    :return:
+    '''
 
+    dic = {}
+    tmpKey = n
 
+    dfDateKey = df.set_index('날짜')
 
+    idxTargetDate = dfDateKey.index.get_loc(targetDate)
 
+    while n != 0:
 
+        for i in range(1, len(df)): # 대상 날짜에서 과거날짜 반복
 
-def checkStockSplit(df, day):
-    for idx, row in df.iterrows():
-        if idx > day:
-            return True
+            checkMost = True
 
-        if idx + 1 > len(df):
-            return True
+            targetIdx = idxTargetDate + i # 비교날짜 인덱스 추출
 
-        if df.loc[idx]['종가'] > df.loc[idx + 1]['종가'] * 1.6:
-            print(idx)
-            return False
-        if df.loc[idx]['종가'] < df.loc[idx + 1]['종가'] * 0.4:
-            print(idx)
-            return False
+            if targetIdx + 1 >= len(df):
+                n -= 1
+                break
 
+            mostPrice = df.loc[targetIdx][gubun] # 첫 비교날짜 가격 추출
 
-def standardizationStockSplit(df):
-    startStockSplit = False
+            for j in range(1, day + 1): # 비교 날짜 앞뒤 날짜 추출 후 가격 최고, 최저 유지 비교
+                # print('targetIdx : i')
 
-    for idx, row in df.iterrows():
-        if idx + 2 > len(df):
-            break
+                afterTargetIdx = targetIdx - j
+                beforeTargetIdx = targetIdx + j
 
-        # 병합
-        if df.loc[idx]['종가'] > df.loc[idx + 1]['종가'] * 1.6 and not startStockSplit:
-            startStockSplit = True
-            gab = (df.loc[idx]['종가'] + df.loc[idx]['전일비']) // df.loc[idx + 1]['종가']
-            continue
+                if afterTargetIdx > idxTargetDate :
 
-        # 분할
-        if df.loc[idx]['종가'] < df.loc[idx + 1]['종가'] * 0.4 and not startStockSplit:
-            startStockSplit = True
-            gab = df.loc[idx + 1]['종가'] // (df.loc[idx]['종가'] - df.loc[idx]['전일비'])
-            gab = 1 / gab
-            continue
+                    if gubun == '고가':
+                        if mostPrice < df.loc[afterTargetIdx][gubun]:
+                            checkMost = False
+                            break
 
-        if startStockSplit:
-            df.iloc[idx, df.columns.get_loc('종가')] = df.loc[idx]['종가'] * gab
-            df.iloc[idx, df.columns.get_loc('시가')] = df.loc[idx]['시가'] * gab
-            df.iloc[idx, df.columns.get_loc('고가')] = df.loc[idx]['고가'] * gab
-            df.iloc[idx, df.columns.get_loc('저가')] = df.loc[idx]['저가'] * gab
+                    if gubun == '저가':
+                        if mostPrice > df.loc[afterTargetIdx][gubun]:
+                            checkMost = False
+                            break
 
-    return df
+                if beforeTargetIdx < len(df) :
+                    if gubun == '고가':
+                        if mostPrice < df.loc[beforeTargetIdx][gubun]:
+                            checkMost = False
+                            break
+
+                    if gubun == '저가':
+                        if mostPrice > df.loc[beforeTargetIdx][gubun]:
+                            checkMost = False
+                            break
+
+            if checkMost == True:
+                dic[tmpKey - n] = {}
+                dic[tmpKey - n]['날짜'] = df.loc[targetIdx]['날짜']
+                dic[tmpKey - n]['가격'] = df.loc[targetIdx][gubun]
+                n -= 1
+
+            if n == 0:
+                break
+
+    if len(dic) == 0:
+        return None
+
+    return dic
+
+def getTrandLine(df, startDate, endDate, gubun):
+
+    dfDateKey = df.set_index('날짜')
+    startDateIdx = dfDateKey.index.get_loc(startDate)
+    endDateIdx = dfDateKey.index.get_loc(endDate)
+    diffDay = startDateIdx - endDateIdx
+
+    startDatePrice = df.loc[startDateIdx][gubun]
+    endDatePrice = df.loc[endDateIdx][gubun]
+    diffPrice = endDatePrice - startDatePrice
+
+    result = round(diffPrice / diffDay, 3)
+
+    return result
+
+def compareTwoDate(date1, date2):
+    if date1 > date2:
+        return True
+    else:
+        return False

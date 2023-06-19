@@ -3,9 +3,9 @@ import module.Common as Common
 import module.excel_collection as excel_collection
 import module.dataProcessing as dataProcessing
 import module.resultBuySell as resultBuySell
+import module.Sort_DF as Sort_Df
 import module.Image as Image
 import pandas as pd
-
 
 rootPath = 'C:\Python_Stocks'
 inputFolderPath = os.path.join(rootPath, 'input')
@@ -13,11 +13,12 @@ outputFolderPath = os.path.join(rootPath, 'output')
 resultFolderPath = os.path.join(rootPath, 'result')
 imgFolderPath = os.path.join(rootPath, 'img')
 
-masterFilePath = os.path.join(rootPath, 'Master.xlsx')
+masterFilePath = os.path.join(inputFolderPath, 'Master.xlsx')
 sheetName = 'KOSPI'
 resultFilePath = os.path.join(resultFolderPath, 'result.xlsx')
 
 dfTotal = pd.DataFrame(columns=['종목코드', 'totalCnt', 'totalCnt0', 'totalCnt1', 'totalCnt2', 'period', 'avgPeriod'])
+
 
 avgSellPriod = 0
 totalSellPeriod = 0
@@ -28,15 +29,15 @@ totalCnt2 = 0
 
 # 이동평균 증감 패턴에 따른 과거 데이터 매도 매수 파악
 
-df = excel_collection.readExcelToDataFrame(masterFilePath, sheetName)
-dfTotal = pd.DataFrame(columns=['code'])
-
 # 폴더 초기화
 Common.clearFolder(imgFolderPath)
 
 df = excel_collection.readExcelToDataFrame(masterFilePath, sheetName)  # 코스피 코드 받아오기
 
 for idx, row in df.iterrows():
+
+    if row['code'] != '000020':
+        continue
 
     # 초기화
     dfCode = dataProcessing.GetStockPrice(row['code'])
@@ -55,11 +56,36 @@ for idx, row in df.iterrows():
     # 코드 이동평균선 뽑아오기
     dicMV = dataProcessing.GetMV(dfCode, 5)
 
-    # 종목의 이동평균선 패턴 따르는 일자 리턴
+    # ......시작 Dic = 조건을 따르는 날짜를 리턴.........
+
+    # 종목의 이동평균선 패턴 따르는 일자 리턴 
     dicMVPatten = dataProcessing.GetMVPattern(dicMV, 'dduu')
+
+    # 최고, 최저 날짜, 가격 뽑기
+    for i in dicMVPatten.copy().keys():
+        dicMostHighPrice = {}
+        dicMostLowPrice = {}
+        dicMostHighPrice = dataProcessing.GetMostPriceBeforeTargetDate(df=dfCode , targetDate=i, day=10, gubun="고가", n=1)
+        dicMostLowPrice = dataProcessing.GetMostPriceBeforeTargetDate(df=dfCode , targetDate=i, day=10, gubun="저가", n=1)
+
+        if dicMostLowPrice is None or dicMostHighPrice is None:
+            continue
+
+        if not dicMostLowPrice[0]['날짜'] in dicTotalLowPrice.keys() :
+            dicTotalLowPrice[dicMostLowPrice[0]['날짜']] = dicMostLowPrice[0]['가격']
+
+        if not dicMostHighPrice[0]['날짜'] in dicTotalHighPrice.keys() :
+            dicTotalHighPrice[dicMostHighPrice[0]['날짜']] = dicMostHighPrice[0]['가격']
+
+        # if dicMostLowPrice[0]['날짜'] < dicMostHighPrice[0]['날짜']:
+        #     del dicMVPatten[i]
+
+    # ......종료 Dic = 조건을 따르는 날짜를 리턴.........
 
     # 날짜 list 의 가격 정보를 리턴
     dicGubunPrice = dataProcessing.getGubunPriceUseDate(dfCode, list(dicMVPatten.keys()))
+
+    print(dicGubunPrice)
 
     for i in dicMVPatten.keys():
         # 날짜, 매수날종가, 소요기간, 구분 리턴
