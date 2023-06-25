@@ -138,7 +138,6 @@ for idx, row in df.iterrows():
         avgSellPeriod = round(totalSellPeriod / totalCnt1, 2)
 '''
 
-
     # dfTotal.loc[len(dfTotal)] = {'종목코드': row['code'], 'totalCnt': totalCnt, 'totalCnt0': totalCnt0, 'totalCnt1': totalCnt1, 'totalCnt2': totalCnt2, 'period' : avgPeriod, 'avgPeriod' : avgSellPeriod}
 
     # excel_collection.saveDFToNewExcel(resultFilePath, 'result', dfTotal)
