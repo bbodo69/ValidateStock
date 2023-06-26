@@ -61,8 +61,8 @@ def SaveDFImageWithScatter(code, df, sFilePath):
 def SaveDFImageWithScatter2(df, x, y, dicScatterData, title, savePath):
     '''
     :param df: 네이버 주식 시세 df, dataProcess.GetStockInfo 결과값
-    :param x: x 축
-    :param y: y 축
+    :param x: x 축, 날짜
+    :param y: y 축, 종가
     :param dicScatterData: key : '날짜',  value : ['가격', '구분']
     :param title: 이미지 상당 제목명
     :param savePath: 이미지 파일 저장위치
@@ -144,6 +144,7 @@ def SaveDFImageWithBuyPrice(code, df, sFilePath, iBuyPrice):
     plt.xticks([0, len(df) / 2, len(df) - 1], rotation=30)  # x 축 thick 지정 갯수 출력
     plt.savefig(sFilePath)
     plt.clf()
+    plt.close("all")
 
 
 def SaveDFImageWithScatter2(df, x, y, dicScatterData, title, savePath):
@@ -184,6 +185,7 @@ def SaveDFImageWithScatter2(df, x, y, dicScatterData, title, savePath):
     plt.xticks([0, len(df) / 2, len(df) - 1], rotation=30)  # x 축 thick 지정 갯수 출력
     plt.savefig(savePath)
     plt.clf()
+    plt.close("all")
 
 
 def SaveDFImageWithScatter3(df, x, dicScatterData, dicTotalHighPrice, dicTotalLowPrice, title, savePath):
@@ -238,6 +240,7 @@ def SaveDFImageWithScatter3(df, x, dicScatterData, dicTotalHighPrice, dicTotalLo
 
     plt.savefig(savePath)
     plt.clf()
+    plt.close("all")
 
 def SaveDFImageWithScatter4(df, x, dicScatterData, title, savePath):
     '''
