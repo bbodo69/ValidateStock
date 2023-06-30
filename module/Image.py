@@ -163,7 +163,6 @@ def SaveDFImageWithScatter2(df, x, y, dicScatterData, title, savePath):
     # for i in dicScatterData:
     #     print(i)
     # print(dicScatterData)
-    print(dicScatterData)
     for i in dicScatterData:
         xPoint = i
         yPoint = dicScatterData[i]['가격']

@@ -89,42 +89,39 @@ def useMVPattern():
 
         # idx 키 값 날짜.
         dfDateKey = dfCode.set_index('날짜')
+        print(row['code'])
 
         # 이동평균 따르는 dic 반복
         for i in dic:
             isSell = False
-            print(1)
 
             idxTargetDate = dfDateKey.index.get_loc(i)
-            buyPrice = dfCode.loc[idxTargetDate]['시가'] * 0.095
+            buyPrice = dfCode.loc[idxTargetDate]['시가'] * 0.995
             sellPrice = buyPrice * 1.025
-            print(2)
-            
-            # 사지 못하는 경우
 
+            # print("{0} < {1} = {2}".format(buyPrice, dfCode.loc[idxTargetDate]['저가'], buyPrice < dfCode.loc[idxTargetDate]['저가']))
+
+            # 사지 못하는 경우
             if buyPrice < dfCode.loc[idxTargetDate]['저가']:
                 continue
-            print(3)
-            # 딕셔너리 매수 내용 저장
-            dicScatterDate[dfCode.loc[idxTargetDate]['날짜']] = {}
-            dicScatterDate[dfCode.loc[idxTargetDate]['날짜']]['가격'] = dfCode.loc[idxTargetDate]['시가'] * 0.095
-            dicScatterDate[dfCode.loc[idxTargetDate]['날짜']]['구분'] = 0
-            print(4)
+
             # 위 날짜 데이터 이후 날짜들 확인
             for j in range(0, idxTargetDate + 1):
                 tmpIdx = idxTargetDate - j
                 if tmpIdx < 0 :
                     break
                 if sellPrice < dfCode.loc[idxTargetDate]['고가']:
+                    print("{0} - {1}".format(dfCode.loc[idxTargetDate]['날짜'], "isSell"))
                     isSell = True
-                    dicScatterDate[dfCode.loc[tmpIdx]['날짜']] = {}
-                    dicScatterDate[dfCode.loc[tmpIdx]['날짜']]['가격'] = dfCode.loc[tmpIdx]['시가'] * 1.025
-                    dicScatterDate[dfCode.loc[tmpIdx]['날짜']]['구분'] = 1
-                    Image.SaveDFImageWithScatter2(df=dfCode, savePath=imgFilePath, dicScatterData=dicScatterDate,
-                                                  x='날짜', y='종가', title=row['code'])
                     break
-            if not isSell:
-                Image.SaveDFImageWithScatter2(df=dfCode, savePath=imgFilePath, dicScatterData=dicScatterDate, x='날짜', y='종가', title=row['code'])
 
+            if not isSell:
+                print("{0} - {1}".format(dfCode.loc[idxTargetDate]['날짜'], "not isSell"))
+                dicScatterDate[dfCode.loc[idxTargetDate]['날짜']] = {}
+                dicScatterDate[dfCode.loc[idxTargetDate]['날짜']]['가격'] = buyPrice
+                dicScatterDate[dfCode.loc[idxTargetDate]['날짜']]['구분'] = 0
+
+        if len(dicScatterDate) > 0 :
+            Image.SaveDFImageWithScatter2(df=dfCode, savePath=imgFilePath, dicScatterData=dicScatterDate, x='날짜', y='종가', title=row['code'])
 
 useMVPattern()
