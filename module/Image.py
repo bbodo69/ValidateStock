@@ -169,12 +169,15 @@ def SaveDFImageWithScatter2(df, x, y, dicScatterData, title, savePath):
 
         if dicScatterData[i]['구분'] == 0:
             color = 'blue'
+            facecolor = 'blue'
         elif dicScatterData[i]['구분'] == 1:
             color = 'red'
+            facecolor = 'none'
         elif dicScatterData[i]['구분'] == 2:
             color = 'black'
+            facecolor = 'black'
 
-        plt.scatter(xPoint, yPoint, color=color)  # 위치에 점 찍기
+        plt.scatter(xPoint, yPoint, color=color, facecolor=facecolor)  # 위치에 점 찍기
 
     # plt.grid(color='gray', linestyle='--')
     plt.title(title)
