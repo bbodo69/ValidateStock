@@ -77,6 +77,7 @@ def useMVPattern():
     iSellCnt = 0
 
     for idx, row in df.iterrows():
+        print(row['code'])
         #
         # if row['code'] != '003570':
         #     continue
@@ -96,14 +97,27 @@ def useMVPattern():
         # 이동평균 따르는 dic 반복
         for i in dic:
             isSell = False
-            print(row['code'])
             idxTargetDate = dfDateKey.index.get_loc(i)
             buyPrice = dfCode.loc[idxTargetDate]['시가'] * 0.995
             sellPrice = buyPrice * 1.025
-            dicMost = dataProcessing.GetMostPriceFromDF(df=dfCode, targetDate=i, day=10, n=2, gubun='고가')
-            print(dicMost)
-'''
+            dicMost = dataProcessing.GetMostPriceFromDF(df=dfCode, targetDate=i, day=7, n=2, gubun='고가')
             # print("{0} < {1} = {2}".format(buyPrice, dfCode.loc[idxTargetDate]['저가'], buyPrice < dfCode.loc[idxTargetDate]['저가']))
+
+            # 비어있으면 넘기기
+            if dicMost is None:
+                continue
+
+            # 고가 2개 미만이면 넘기기.
+            if len(dicMost) < 2:
+                continue
+
+#### 넘길 조건 추가 영영 ###
+            # 최근 고가가 이전 고가보다 가격이 낮으면 넘기기.
+            if dicMost[0]['가격'] < dicMost[1]['가격'] :
+                continue
+
+
+#########################
 
             # 사지 못하는 경우
             if buyPrice < dfCode.loc[idxTargetDate]['저가']:
@@ -131,10 +145,11 @@ def useMVPattern():
                 dicScatterDate[dfCode.loc[idxTargetDate]['날짜']] = {}
                 dicScatterDate[dfCode.loc[idxTargetDate]['날짜']]['가격'] = buyPrice
                 dicScatterDate[dfCode.loc[idxTargetDate]['날짜']]['구분'] = 0
+                print("날짜 : {0}, 가격 : {1} / 날짜 : {2}, 가격 : {3}".format(dicMost[0]['날짜'], dicMost[0]['가격'], dicMost[1]['날짜'], dicMost[1]['가격']))
+
 
         if len(dicScatterDate) > 0 :
             Image.SaveDFImageWithScatter2(df=dfCode, savePath=imgFilePath, dicScatterData=dicScatterDate, x='날짜', y='종가', title=row['code'])
 
         print("{0} / {1}, {2} / {3}, {4}".format(idx + 1, len(df), round(iSellCnt/iBuyCnt, 3), iSellCnt, iBuyCnt))
-'''
 useMVPattern()
