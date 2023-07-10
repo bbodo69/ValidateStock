@@ -874,3 +874,26 @@ def compareTwoDate(date1, date2):
         return True
     else:
         return False
+
+
+def getProfitLoss(df, buyDate, profitPrice, lossPrice):
+    '''
+    :param df: 네이버 시세 DF
+    :param buyDate: 손절 익절, 시작할 날짜
+    :param profitPrice: 익절 가격
+    :param LossPrice: 손절 가격
+    :return: 0 = 익절, 1 = 손절, 9 = 두 해당사항 없음.
+    '''
+
+    dfDateKey = df.set_index('날짜')
+    idxBuyDate = dfDateKey.index.get_loc(buyDate)
+
+    for i in range(1, idxBuyDate+1) :
+        targetIdx = idxBuyDate - i
+
+        if df.loc[targetIdx]['고가'] >= profitPrice:
+            return 0
+        if df.loc[targetIdx]['저가'] < lossPrice:
+            return 1
+
+    return 9

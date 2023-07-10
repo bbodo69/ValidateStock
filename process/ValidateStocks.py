@@ -75,6 +75,9 @@ def useMVPattern():
 
     iBuyCnt = 0
     iSellCnt = 0
+    iSellProfitCnt = 0
+    iSellLossCnt = 0
+    iNotSellCnt = 0
 
     for idx, row in df.iterrows():
         print(row['code'])
@@ -96,6 +99,7 @@ def useMVPattern():
 
         # 이동평균 따르는 dic 반복
         for i in dic:
+
             isSell = False
             idxTargetDate = dfDateKey.index.get_loc(i)
             buyPrice = dfCode.loc[idxTargetDate]['시가'] * 0.995
@@ -117,27 +121,38 @@ def useMVPattern():
                 continue
 
 
+
 #########################
 
             # 사지 못하는 경우
             if buyPrice < dfCode.loc[idxTargetDate]['저가']:
                 continue
 
-            iBuyCnt += 1
-                
             # 밑에는 사는 경우.
+            iBuyCnt += 1
+
             # 위 날짜 데이터 이후 날짜들 확인
             for j in range(0, idxTargetDate + 1):
                 tmpIdx = idxTargetDate - j
                 if tmpIdx < 0 :
                     break
-                # 팔리는 경우 체크
+                # 익절
                 if sellPrice < dfCode.loc[tmpIdx]['고가']:
-                    dicScatterDate[dfCode.loc[idxTargetDate]['날짜']] = {}
-                    dicScatterDate[dfCode.loc[idxTargetDate]['날짜']]['가격'] = buyPrice
-                    dicScatterDate[dfCode.loc[idxTargetDate]['날짜']]['구분'] = 1
-                    iSellCnt += 1
+                    # dicScatterDate[dfCode.loc[idxTargetDate]['날짜']] = {}
+                    # dicScatterDate[dfCode.loc[idxTargetDate]['날짜']]['가격'] = buyPrice
+                    # dicScatterDate[dfCode.loc[idxTargetDate]['날짜']]['구분'] = 1
+                    iSellProfitCnt += 1
                     isSell = True
+
+                # 손절
+                # if buyPrice * 0.97 > dfCode.loc[tmpIdx]['저가']:
+                #     dicScatterDate[dfCode.loc[idxTargetDate]['날짜']] = {}
+                #     dicScatterDate[dfCode.loc[idxTargetDate]['날짜']]['가격'] = buyPrice
+                #     dicScatterDate[dfCode.loc[idxTargetDate]['날짜']]['구분'] = 0
+                #     iSellLossCnt += 1
+                #     isSell = True
+
+                if isSell:
                     break
 
             # 팔리지 않은 경우
@@ -145,11 +160,18 @@ def useMVPattern():
                 dicScatterDate[dfCode.loc[idxTargetDate]['날짜']] = {}
                 dicScatterDate[dfCode.loc[idxTargetDate]['날짜']]['가격'] = buyPrice
                 dicScatterDate[dfCode.loc[idxTargetDate]['날짜']]['구분'] = 0
+                iNotSellCnt += 1
                 print("날짜 : {0}, 가격 : {1} / 날짜 : {2}, 가격 : {3}".format(dicMost[0]['날짜'], dicMost[0]['가격'], dicMost[1]['날짜'], dicMost[1]['가격']))
 
+                dicScatterDate[dicMost[0]['날짜']] = {}
+                dicScatterDate[dicMost[0]['날짜']]['가격'] = dicMost[0]['가격']
+                dicScatterDate[dicMost[0]['날짜']]['구분'] = 3
+                dicScatterDate[dicMost[1]['날짜']] = {}
+                dicScatterDate[dicMost[1]['날짜']]['가격'] = dicMost[1]['가격']
+                dicScatterDate[dicMost[1]['날짜']]['구분'] = 4
 
         if len(dicScatterDate) > 0 :
             Image.SaveDFImageWithScatter2(df=dfCode, savePath=imgFilePath, dicScatterData=dicScatterDate, x='날짜', y='종가', title=row['code'])
 
-        print("{0} / {1}, {2} / {3}, {4}".format(idx + 1, len(df), round(iSellCnt/iBuyCnt, 3), iSellCnt, iBuyCnt))
+        print("{0}/{1} | {2}, {3}, {4}".format(idx + 1, len(df), iBuyCnt, iSellProfitCnt, iNotSellCnt))
 useMVPattern()

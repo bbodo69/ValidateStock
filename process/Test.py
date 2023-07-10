@@ -1,1 +1,4 @@
-print(round(2/3, 3))
+Temp = 10
+
+for i in range(1, 10+1) :
+    print(Temp-i)
