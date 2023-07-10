@@ -568,6 +568,36 @@ def GetMV(df, day):
 
     return dic
 
+def getUpDownMV(df, day, date):
+    '''
+    이동평균선의 상승, 하락추세를 리턴
+    :param df: 네이버 시세 DF
+    :param day: n 이동평균선
+    :param date: 상승, 하락 추세 구할 날짜
+    :return: 0 = up, 1 = down, 9 = df 길이 짧음.
+    '''
+
+    dfDateKey = df.set_index('날짜')
+    idxDate = dfDateKey.index.get_loc(date)
+
+    n = day
+    targetMV = 0
+    preMV = 0
+
+    if idxDate + day >= len(df):
+        return 9
+
+    for j in range(0, n):
+        targetMV += int(df.loc[idxDate + j]['종가'])
+
+    for j in range(0, n):
+        preMV += int(df.loc[idxDate + j + 1]['종가'])
+
+    if targetMV > preMV :
+        return 0
+    else:
+        return 1
+
 def GetMVPattern(dic, gubun):
 
     dicResult = {}

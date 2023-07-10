@@ -99,6 +99,10 @@ def useMVPattern():
 
         # 이동평균 따르는 dic 반복
         for i in dic:
+            upDownMV = dataProcessing.getUpDownMV(df=dfCode, day=60, date=i)
+
+            if upDownMV != 0:
+                continue
 
             isSell = False
             idxTargetDate = dfDateKey.index.get_loc(i)
