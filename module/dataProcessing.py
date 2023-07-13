@@ -884,6 +884,87 @@ def GetMostPriceBeforeTargetDate(df, targetDate, day, gubun, n):
 
     return dic
 
+def GetMostPriceBeforeAfter(df, targetDate, before, after, gubun, n):
+    '''
+    :param df:
+    :param date: 대상 날짜
+    :param day:  유지 기간
+    :param gubun: '고가', '저가' 구분
+    :param n: 뽑을 갯수
+    :return:
+    '''
+
+    dic = {}
+    tmpKey = n
+
+    dfDateKey = df.set_index('날짜')
+
+    idxTargetDate = dfDateKey.index.get_loc(targetDate)
+
+    while n != 0:
+
+        for i in range(1, len(df)): # 대상 날짜에서 과거날짜 반복
+
+            checkMost = True
+
+            targetIdx = idxTargetDate + i # 비교날짜 인덱스 추출
+
+            if targetIdx + 1 >= len(df):
+                n -= 1
+                break
+
+            mostPrice = df.loc[targetIdx][gubun] # 첫 비교날짜 가격 추출
+
+            for j in range(1, after + 1): # 비교 날짜 앞뒤 날짜 추출 후 가격 최고, 최저 유지 비교
+                # print('targetIdx : i')
+
+                afterTargetIdx = targetIdx - j
+
+                if afterTargetIdx > idxTargetDate :
+
+                    if gubun == '고가':
+                        if mostPrice < df.loc[afterTargetIdx][gubun]:
+                            checkMost = False
+                            break
+
+                    if gubun == '저가':
+                        if mostPrice > df.loc[afterTargetIdx][gubun]:
+                            checkMost = False
+                            break
+
+            if not checkMost:
+                continue
+
+            for j in range(1, before + 1): # 비교 날짜 앞뒤 날짜 추출 후 가격 최고, 최저 유지 비교
+                # print('targetIdx : i')
+
+                beforeTargetIdx = targetIdx + j
+
+                if beforeTargetIdx < len(df) :
+                    if gubun == '고가':
+                        if mostPrice < df.loc[beforeTargetIdx][gubun]:
+                            checkMost = False
+                            break
+
+                    if gubun == '저가':
+                        if mostPrice > df.loc[beforeTargetIdx][gubun]:
+                            checkMost = False
+                            break
+
+            if checkMost == True:
+                dic[tmpKey - n] = {}
+                dic[tmpKey - n]['날짜'] = df.loc[targetIdx]['날짜']
+                dic[tmpKey - n]['가격'] = df.loc[targetIdx][gubun]
+                n -= 1
+
+            if n == 0:
+                break
+
+    if len(dic) == 0:
+        return None
+
+    return dic
+
 def getTrandLine(df, startDate, endDate, gubun):
 
     dfDateKey = df.set_index('날짜')

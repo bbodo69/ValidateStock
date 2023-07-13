@@ -94,9 +94,16 @@ def useMVPattern():
         dfCode = dataProcessing.standardizationStockSplit(dfCode)
         dic = dataProcessing.GetDateFollowingMAPattern(df=dfCode, day=5, gubun='dduu')
 
+        # dicMost = dataProcessing.GetMostPriceBeforeTargetDate(df=dfCode, day=15, n=5, gubun='저가', targetDate='2023.07.13')
+        # dicMost = dataProcessing.GetMostPriceFromDF(df=dfCode, day=15, n=5, gubun='저가', targetDate='2023.07.13')
+        dicMost = dataProcessing.GetMostPriceBeforeAfter(df=dfCode, before=15, after=3, n=5, gubun='저가', targetDate='2023.07.13')
+
+        print(dicMost)
+
         # idx 키 값 날짜.
         dfDateKey = dfCode.set_index('날짜')
 
+'''
         # 이동평균 따르는 dic 반복
         for i in dic:
             upDownMV = dataProcessing.getUpDownMV(df=dfCode, day=60, date=i)
@@ -123,8 +130,6 @@ def useMVPattern():
             # 최근 고가가 이전 고가보다 가격이 낮으면 넘기기.
             if dicMost[0]['가격'] < dicMost[1]['가격'] :
                 continue
-
-
 
 #########################
 
@@ -178,4 +183,5 @@ def useMVPattern():
             Image.SaveDFImageWithScatter2(df=dfCode, savePath=imgFilePath, dicScatterData=dicScatterDate, x='날짜', y='종가', title=row['code'])
 
         print("{0}/{1} | {2}, {3}, {4}".format(idx + 1, len(df), iBuyCnt, iSellProfitCnt, iNotSellCnt))
+'''
 useMVPattern()
